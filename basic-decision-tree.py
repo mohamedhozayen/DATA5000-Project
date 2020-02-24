@@ -19,6 +19,7 @@ for i in range(1, 31):
 df.columns = header
 df = df.drop(['id'], axis=1).replace(['M', 'B'], [1, 0])
 
+df = optimal_features
 # Split into train and test
 X = df.drop(['class'], axis=1)
 Y = df['class']

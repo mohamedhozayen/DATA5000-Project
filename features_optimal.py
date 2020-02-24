@@ -147,48 +147,12 @@ summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = ts
 summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne2_data
 summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne3_data
 summary_table_balance_supervised = summary_table_balance_supervised.sort_values(by=['pre@recall50'], ascending = False)
-summary_table_balance_supervised.to_csv('supervised-features-balance-summary_table.csv') 
+summary_table_balance_supervised.to_csv('supervised-features-balance-summary_table.csv')
 
+#summary_table_balance_supervised[summary_table_balance_supervised['method-balance']=='pca_cos-ANOVA'] 
 
-depth_2 = summary_table_balance[summary_table_balance['optimal-depth']==2]
-depth_3 = summary_table_balance[summary_table_balance['optimal-depth']==3]
-depth_4 = summary_table_balance[summary_table_balance['optimal-depth']==4]
-depth_5 = summary_table_balance[summary_table_balance['optimal-depth']==5]
-depth_6 = summary_table_balance[summary_table_balance['optimal-depth']==6]
-depth_7 = summary_table_balance[summary_table_balance['optimal-depth']==7]
-
-depth_2.to_csv('depth-2.csv') 
-depth_3.to_csv('depth-3.csv') 
-depth_4.to_csv('depth-4.csv') 
-depth_5.to_csv('depth-5.csv') 
-depth_6.to_csv('depth-6.csv') 
-depth_7.to_csv('depth-7.csv') 
-
-summary_tree = pd.DataFrame()
-
-temp = depth_2[depth_2['pre@recall50'] > 0.075]
-summary_tree = summary_tree.append(temp)
-
-temp = depth_3[depth_3['pre@recall50'] > 0.076]
-summary_tree = summary_tree.append(temp)
-
-temp = depth_4[depth_4['pre@recall50'] > 0.076]
-summary_tree = summary_tree.append(temp)
-
-temp = depth_5[depth_5['pre@recall50'] > 0.076]
-summary_tree = summary_tree.append(temp)
-
-temp = depth_6[depth_6['pre@recall50'] > 0.076]
-summary_tree = summary_tree.append(temp)
-
-temp = depth_7[depth_7['pre@recall50'] > 0.076]
-summary_tree = summary_tree.append(temp)
-
-
-summary_tree.to_csv('performance-optimal-summary-trees.csv') 
-
-
-optimal_features = fs.RFECV_DT(pca_cos, min_features_to_select=4, max_depth=4)
+pca_cos = fs.pca_kernel(df, kernel='cosine')
+optimal_features = fs.select_k_best_ANOVA(pca_cos, k=7)
 optimal_features.to_csv('optimal_features_pca_cos.csv') 
 
 
@@ -278,6 +242,45 @@ summary_balance.append(['poly-', rslt_kernel.index(max(rslt_kernel)), max(rslt_k
 pca_kernel = fs.pca_kernel(df, kernel='cosine')
 rslt_kernel = main.test_tree_depth(pca_kernel, class_weight="balanced")
 summary_balance.append(['cosine-', rslt_kernel.index(max(rslt_kernel)), max(rslt_kernel)])
+
+
+depth_2 = summary_table_balance[summary_table_balance['optimal-depth']==2]
+depth_3 = summary_table_balance[summary_table_balance['optimal-depth']==3]
+depth_4 = summary_table_balance[summary_table_balance['optimal-depth']==4]
+depth_5 = summary_table_balance[summary_table_balance['optimal-depth']==5]
+depth_6 = summary_table_balance[summary_table_balance['optimal-depth']==6]
+depth_7 = summary_table_balance[summary_table_balance['optimal-depth']==7]
+
+depth_2.to_csv('depth-2.csv') 
+depth_3.to_csv('depth-3.csv') 
+depth_4.to_csv('depth-4.csv') 
+depth_5.to_csv('depth-5.csv') 
+depth_6.to_csv('depth-6.csv') 
+depth_7.to_csv('depth-7.csv') 
+
+summary_tree = pd.DataFrame()
+
+temp = depth_2[depth_2['pre@recall50'] > 0.075]
+summary_tree = summary_tree.append(temp)
+
+temp = depth_3[depth_3['pre@recall50'] > 0.076]
+summary_tree = summary_tree.append(temp)
+
+temp = depth_4[depth_4['pre@recall50'] > 0.076]
+summary_tree = summary_tree.append(temp)
+
+temp = depth_5[depth_5['pre@recall50'] > 0.076]
+summary_tree = summary_tree.append(temp)
+
+temp = depth_6[depth_6['pre@recall50'] > 0.076]
+summary_tree = summary_tree.append(temp)
+
+temp = depth_7[depth_7['pre@recall50'] > 0.076]
+summary_tree = summary_tree.append(temp)
+
+
+summary_tree.to_csv('performance-optimal-summary-trees.csv') 
+
 
 plt.figure(figsize=(20,20))
 plt.tight_layout()
