@@ -32,22 +32,22 @@ def evaluate_corr(data, data_str_name, n_features, max_dapth):
     """
     summary_balance = []
     
-    pearson = fs.corr_linear(data, method='pearson')
-    spearman = fs.corr_linear(data, method='spearman')
-    p_class = pearson['class']
-    s_class = spearman['class']
-    
+#    pearson = fs.corr_linear(data, method='pearson')
+#    spearman = fs.corr_linear(data, method='spearman')
+#    p_class = pearson['class']
+#    s_class = spearman['class']
+#    
     for i in range(1, n_features+1):
 
-        pearson = pearson.drop(['class'], axis=1)
-        pearson = pd.concat([pearson.iloc[:,0:i], p_class], axis=1)
-        out = model_evaluation.test_tree_depth(pearson, class_weight="balanced")
-        summary_balance.append([data_str_name + '-pearson' , i, out.index(max(out)), max(out)])
-        
-        spearman = spearman.drop(['class'], axis=1)
-        spearman = pd.concat([spearman.iloc[:,0:i], s_class], axis=1)
-        out = model_evaluation.test_tree_depth(spearman, class_weight="balanced")
-        summary_balance.append([data_str_name + '-spearman', i, out.index(max(out)), max(out)])
+#        pearson = pearson.drop(['class'], axis=1)
+#        pearson = pd.concat([pearson.iloc[:,0:i], p_class], axis=1)
+#        out = model_evaluation.test_tree_depth(pearson, class_weight="balanced")
+#        summary_balance.append([data_str_name + '-pearson' , i, out.index(max(out)), max(out)])
+#        
+#        spearman = spearman.drop(['class'], axis=1)
+#        spearman = pd.concat([spearman.iloc[:,0:i], s_class], axis=1)
+#        out = model_evaluation.test_tree_depth(spearman, class_weight="balanced")
+#        summary_balance.append([data_str_name + '-spearman', i, out.index(max(out)), max(out)])
         
         df = fs.select_k_best_ANOVA(data, k=n_features)
         out = model_evaluation.test_tree_depth(df, class_weight="balanced")
@@ -102,6 +102,7 @@ summary_balance.append(['pca-15', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 tsne = fs.tsne(df, n=1) #3 is max
 rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight="balanced")
 summary_balance.append(['tsne-1', rslt_tsne.index(max(rslt_tsne)), max(rslt_tsne)])   
+tsne.to_csv('tsne-1.csv') 
 
 tsne = fs.tsne(df, n=2) #3 is max
 rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight="balanced")
@@ -122,6 +123,7 @@ summary_balance.append(['poly-', rslt_kernel.index(max(rslt_kernel)), max(rslt_k
 pca_kernel = fs.pca_kernel(df, kernel='cosine')
 rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight="balanced")
 summary_balance.append(['cosine-', rslt_kernel.index(max(rslt_kernel)), max(rslt_kernel)])
+pca_kernel.to_csv('pca-cosine.csv') 
 
 summary_table_balance = pd.DataFrame(summary_balance)
 summary_table_balance.columns = ['method-balance', 'optimal-depth', 'pre@recall50']
@@ -129,15 +131,23 @@ summary_table_balance = summary_table_balance.sort_values(by=['pre@recall50'], a
 summary_table_balance.to_csv('unsupervised-features-balance-summary_table.csv') 
 
 
-pca_rbf = pd.read_csv('Files\pca-rbf-features.csv', sep=',').drop(['id'], axis=1) 
-pca_poly = pd.read_csv('Files\pca-poly-features.csv', sep=',').drop(['id'], axis=1) 
-pca_cos = pd.read_csv('Files\pca-cos-features.csv', sep=',').drop(['id'], axis=1) 
-pca_10 = pd.read_csv('Files\pca-10-features.csv', sep=',').drop(['id'], axis=1) 
+pca_cos = pd.read_csv('pca-cosine.csv', sep=',').drop(['index'], axis=1) 
+tsne1 = pd.read_csv('tsne-1.csv', sep=',').drop(['index'], axis=1) 
 
-summary_table_balance = pd.DataFrame(summary_balance)
-summary_table_balance.columns = ['method-balance', 'n_features', 'optimal-depth', 'pre@recall50']
-summary_table_balance = summary_table_balance.sort_values(by=['pre@recall50'], ascending = False)
-summary_table_balance.to_csv('supervised-features-balance-summary_table.csv') 
+summary_balance_supervised = []
+summary_balance_supervised.extend(evaluate_corr(pca_cos, 'pca_cos', n_features=10, max_dapth=9))
+#summary_balance_supervised.extend(evaluate_corr(tsne1, 'tsne_1', n_features=10, max_dapth=9))
+
+summary_table_balance_supervised = pd.DataFrame(summary_balance_supervised)
+summary_table_balance_supervised.columns = ['method-balance', 'n_features', 'optimal-depth', 'pre@recall50']
+tsne1_data = ['tsne-1', 1, 3, 0.8803418803418803]
+tsne2_data = ['tsne-2', 2, 6, 0.8969072164948454]
+tsne3_data = ['tsne-3', 3, 3, 0.7545454545454545]
+summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne1_data
+summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne2_data
+summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne3_data
+summary_table_balance_supervised = summary_table_balance_supervised.sort_values(by=['pre@recall50'], ascending = False)
+summary_table_balance_supervised.to_csv('supervised-features-balance-summary_table.csv') 
 
 
 depth_2 = summary_table_balance[summary_table_balance['optimal-depth']==2]

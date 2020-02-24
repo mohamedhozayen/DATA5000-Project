@@ -22,7 +22,7 @@ rand_state = randint(0, 100)
 ################################
 
 # Report will plot a PR curve and return the test stat
-def report(name, y_true, y_pred, y_prob, verbos=True):
+def report(name, y_true, y_pred, y_prob, verbos=False):
 
     cm = confusion_matrix(y_true, y_pred)
     precision, recall, thresholds = precision_recall_curve(y_true, y_prob)
