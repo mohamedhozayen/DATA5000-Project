@@ -40,8 +40,12 @@ def report(name, y_true, y_pred, y_prob, verbos=False):
         print("Confusion Matrix: \n" + str(cm))
         print('Pr@Re50 = ', PrecisionAtRe50_DT)
         print()
+        
         plt.plot(recall, precision,label=name + ", Pr@Re>50 = {0:.5f}".format(PrecisionAtRe50_DT))
-   
+        plt.title("Precision-Recall Curve")
+        plt.xlabel('Recall')
+        plt.ylabel('Precision')
+
     return PrecisionAtRe50_DT
 
 # This function trains and tests a model
@@ -86,7 +90,14 @@ def test_tree_depth(data, class_weight=None):
         test_stats.append(main(df=data, name="DT with depth = "+str(i), model=dt))
     return test_stats
 
-
-
+#df = pd.read_csv('wdbc-labelled.data', sep=',')
+#
+#df = prc.detect_outlier_iterative_IQR(df)
+#df = prc.handle_outlier(df)
+#df = prc.standarize(df) # or normalize
+#
+#pca_cos = fs.pca_kernel(df, kernel='cosine')
+#optimal_features = fs.select_k_best_ANOVA(pca_cos, k=7)
+#test_tree_depth(optimal_features, class_weight="balanced")
 
 

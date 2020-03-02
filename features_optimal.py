@@ -73,57 +73,57 @@ df = prc.handle_outlier(df)
 df = prc.standarize(df) # or normalize
 
 summary_balance = []
-
+class_weight="balanced"
 
 vt = fs.variance_threshold(df, 1)
-rslt_vt = model_evaluation.test_tree_depth(vt, class_weight="balanced")
+rslt_vt = model_evaluation.test_tree_depth(vt, class_weight)
 summary_balance.append(['variance-threshold', rslt_vt.index(max(rslt_vt)), max(rslt_vt)])
 
 pca = fs.pca_linear(df, n=2) # n_c9 is 9, based VarianceThreshold results, axis to gain most information
-rslt_pca = model_evaluation.test_tree_depth(pca, class_weight="balanced")
+rslt_pca = model_evaluation.test_tree_depth(pca, class_weight)
 summary_balance.append(['pca-2', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 
 pca = fs.pca_linear(df, n=7) # n_c9 is 9, based VarianceThreshold results, axis to gain most information
-rslt_pca = model_evaluation.test_tree_depth(pca, class_weight="balanced")
+rslt_pca = model_evaluation.test_tree_depth(pca, class_weight)
 summary_balance.append(['pca-7', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 
 pca = fs.pca_linear(df, n=9) # n_c9 is 9, based VarianceThreshold results, axis to gain most information
-rslt_pca = model_evaluation.test_tree_depth(pca, class_weight="balanced")
+rslt_pca = model_evaluation.test_tree_depth(pca, class_weight)
 summary_balance.append(['pca-9', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 
 pca = fs.pca_linear(df, n=10) # n_c9 is 9, based VarianceThreshold results, axis to gain most information
-rslt_pca = model_evaluation.test_tree_depth(pca, class_weight="balanced")
+rslt_pca = model_evaluation.test_tree_depth(pca, class_weight)
 summary_balance.append(['pca-10', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 
 pca = fs.pca_linear(df, n=15) # n_c9 is 9, based VarianceThreshold results, axis to gain most information
-rslt_pca = model_evaluation.test_tree_depth(pca, class_weight="balanced")
+rslt_pca = model_evaluation.test_tree_depth(pca, class_weight)
 summary_balance.append(['pca-15', rslt_pca.index(max(rslt_pca)), max(rslt_pca)])
 
-tsne = fs.tsne(df, n=1) #3 is max
-rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight="balanced")
+tsne_1 = fs.tsne(df, n=1) #3 is max
+rslt_tsne = model_evaluation.test_tree_depth(tsne_1, class_weight)
 summary_balance.append(['tsne-1', rslt_tsne.index(max(rslt_tsne)), max(rslt_tsne)])   
-tsne.to_csv('tsne-1.csv') 
+#tsne.to_csv('tsne-1.csv') 
 
 tsne = fs.tsne(df, n=2) #3 is max
-rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight="balanced")
+rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight)
 summary_balance.append(['tsne-2', rslt_tsne.index(max(rslt_tsne)), max(rslt_tsne)])  
 
 tsne = fs.tsne(df, n=3) #3 is max
-rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight="balanced")
+rslt_tsne = model_evaluation.test_tree_depth(tsne, class_weight)
 summary_balance.append(['tsne-3', rslt_tsne.index(max(rslt_tsne)), max(rslt_tsne)])  
 
 pca_kernel = fs.pca_kernel(df, kernel='rbf') #kernel : “linear” | “poly” | “rbf” | “sigmoid” | “cosine” | “precomputed”
-rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight="balanced")
+rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight)
 summary_balance.append(['rbf-', rslt_kernel.index(max(rslt_kernel)), max(rslt_kernel)])
 
 pca_kernel = fs.pca_kernel(df, kernel='poly') 
-rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight="balanced")
+rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight)
 summary_balance.append(['poly-', rslt_kernel.index(max(rslt_kernel)), max(rslt_kernel)])
 
-pca_kernel = fs.pca_kernel(df, kernel='cosine')
-rslt_kernel = model_evaluation.test_tree_depth(pca_kernel, class_weight="balanced")
+pca_cos = fs.pca_kernel(df, kernel='cosine')
+rslt_kernel = model_evaluation.test_tree_depth(pca_cos, class_weight)
 summary_balance.append(['cosine-', rslt_kernel.index(max(rslt_kernel)), max(rslt_kernel)])
-pca_kernel.to_csv('pca-cosine.csv') 
+#pca_kernel.to_csv('pca-cosine.csv') 
 
 summary_table_balance = pd.DataFrame(summary_balance)
 summary_table_balance.columns = ['method-balance', 'optimal-depth', 'pre@recall50']
@@ -131,8 +131,9 @@ summary_table_balance = summary_table_balance.sort_values(by=['pre@recall50'], a
 summary_table_balance.to_csv('unsupervised-features-balance-summary_table.csv') 
 
 
-pca_cos = pd.read_csv('pca-cosine.csv', sep=',').drop(['index'], axis=1) 
-tsne1 = pd.read_csv('tsne-1.csv', sep=',').drop(['index'], axis=1) 
+#pca_cos = pd.read_csv('pca-cosine.csv', sep=',').drop(['index'], axis=1) 
+#tsne1 = pd.read_csv('tsne-1.csv', sep=',').drop(['index'], axis=1) 
+
 
 summary_balance_supervised = []
 summary_balance_supervised.extend(evaluate_corr(pca_cos, 'pca_cos', n_features=10, max_dapth=9))
@@ -147,13 +148,16 @@ summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = ts
 summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne2_data
 summary_table_balance_supervised.loc[len(summary_table_balance_supervised)] = tsne3_data
 summary_table_balance_supervised = summary_table_balance_supervised.sort_values(by=['pre@recall50'], ascending = False)
-summary_table_balance_supervised.to_csv('supervised-features-balance-summary_table.csv')
+#summary_table_balance_supervised.to_csv('supervised-features-balance-summary_table.csv')
 
 #summary_table_balance_supervised[summary_table_balance_supervised['method-balance']=='pca_cos-ANOVA'] 
 
 pca_cos = fs.pca_kernel(df, kernel='cosine')
 optimal_features = fs.select_k_best_ANOVA(pca_cos, k=7)
-optimal_features.to_csv('optimal_features_pca_cos.csv') 
+#optimal_features.to_csv('optimal_features_pca_cos.csv') 
+
+t1 = pd.read_csv('supervised-features-balance-summary_table.csv', sep=',')
+t2 = pd.read_csv('unsupervised-features-balance-summary_table.csv', sep=',')
 
 
 """
